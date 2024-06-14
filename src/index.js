@@ -38,14 +38,16 @@ function getRangeModule(ace) {
 }
 
 // our constructor
-function AceDiff(options = {}) {
+function AceDiff(options = {}, saveCallback) {
   // Ensure instance is a constructor with `new`
   if (!(this instanceof AceDiff)) {
-    return new AceDiff(options);
+    return new AceDiff(options, saveCallback);
   }
 
   // Current instance we pass around to other functions
   const acediff = this;
+  acediff.saveCallback = saveCallback;
+  
   const getDefaultAce = () => (window ? window.ace : undefined);
 
   acediff.options = merge({
@@ -320,7 +322,12 @@ function addEventHandlers(acediff) {
   };
   
   query.on('document', 'click', '.acediff_action_save', (e) => {
-	alert('click');
+	if(acediff.saveCallback){
+	  acediff.saveCallback({
+		  left: acediff.editors.left.ace.getValue(),
+		  right: acediff.editors.right.ace.getValue()
+	  });
+	}
   });
 
   query.on('document', 'click', '.acediff_action_next', (e) => {
